@@ -32,6 +32,25 @@ app.get('/next-metro', (req, res) => {
   return res.status(200).json({ station, line: 'M1', headwayMin: 3, nextArrival: nextTimeFromNow(3) });
 });
 
+const {Pool} = require('pg');
+const pool = new Pool({
+  host: process.env.PGHOST,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
+  port: process.env.PGPORT || 5432,
+});
+
+// Endpoint avec base de données
+app.get('/stations', async (_req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM stations');
+    return res.status(200).json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: 'database error' });
+  }
+});
+
 // 404 JSON
 app.use((_req, res) => res.status(404).json({ error: 'not found' }));
 
