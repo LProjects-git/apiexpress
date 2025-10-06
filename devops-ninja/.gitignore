@@ -1,0 +1,9 @@
+node_modules/
+devops-ninja/
+.history/
+.env
+dist/
+.DS_Store
+Thumbs.db
+
+
