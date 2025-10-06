@@ -11,7 +11,8 @@ const fs = require('fs');
 const yaml = require('yaml');
 const swaggerDoc = yaml.parse(fs.readFileSync('./devops-ninja/openapi/openapi.yaml', 'utf8'));
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-
+// Fonctions utilitaires
+const { nextTimeFromNow } = require('./time');
 const PORT = process.env.PORT || 3000;
 
 // DB pool minimal (env avec valeurs par défaut pour Compose)
@@ -20,7 +21,7 @@ const dbPool = new Pool({
 	user: process.env.PGUSER || "app",
 	password: process.env.PGPASSWORD || "app",
 	database: process.env.PGDATABASE || "dernier_metro",
-	host: process.env.PGHOST || "postgres",
+	host: process.env.PGHOST || "localhost",
 	port: Number(process.env.PGPORT || 5432),
 	max: 5,
 	idleTimeoutMillis: 10000
@@ -50,14 +51,6 @@ app.get('/db-health', async (_req, res) => {
 	}
 });
 
-// Utilitaire pour simuler un horaire HH:MM
-function nextTimeFromNow(headwayMin = 3) {
-	const now = new Date();
-	const next = new Date(now.getTime() + headwayMin * 60 * 1000);
-	const hh = String(next.getHours()).padStart(2, '0');
-	const mm = String(next.getMinutes()).padStart(2, '0');
-	return `${hh}:${mm}`;
-}
 
 // Endpoint métier minimal
 app.get('/next-metro', (req, res) => {
@@ -67,9 +60,7 @@ app.get('/next-metro', (req, res) => {
   }  try {
     const line = 'M1';
     const headwayMin = 3;
-    const now = new Date();
-    now.setMinutes(now.getMinutes() + headwayMin);
-    const nextArrival = now.toTimeString().slice(0, 5); // "HH:MM"
+    const nextArrival = nextTimeFromNow(headwayMin);
     return res.status(200).json({
       station: station.toLowerCase(),line,headwayMin,nextArrival});
   } catch (error) {
