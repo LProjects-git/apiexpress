@@ -1,6 +1,17 @@
 "use strict";
+// Express
 const express = require("express");
 const app = express();
+// CORS
+const cors = require('cors');
+app.use(cors());
+// Swagger UI
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+const yaml = require('yaml');
+const swaggerDoc = yaml.parse(fs.readFileSync('./devops-ninja/openapi/openapi.yaml', 'utf8'));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
 const PORT = process.env.PORT || 3000;
 
 // DB pool minimal (env avec valeurs par défaut pour Compose)
