@@ -14,9 +14,11 @@ services:
       - PGPASSWORD=${PGPASSWORD}         # Doit correspondre à POSTGRES_PASSWORD ci-dessous
       - PGDATABASE=${PGDATABASE} # Doit correspondre à POSTGRES_DB ci-dessous
     ports:
-      - "${PORT}:5000"            # host:container → http://localhost:5001
+      - "5001:5000"            # host:container → http://localhost:5001
     depends_on:
       - postgres               # Démarre la DB avant l'API (ordre de démarrage)
+    volumes:
+      - ./openapi:/app/openapi:ro
 
   postgres:
     image: postgres:16-alpine  # Image légère adaptée au dev/CI
@@ -35,7 +37,7 @@ services:
     environment:
       - SWAGGER_JSON=/openapi/openapi.yaml # Chemin du fichier dans le conteneur
     volumes:
-      - ./openapi:/usr/share/nginx/html/openapi:ro # Monte la spec locale dans le conteneur
+      - ./openapi:/openapi:ro # Monte la spec locale dans le conteneur
     ports:
       - "8080:8080"            # Ouvre Swagger UI sur http://localhost:8080
     depends_on:
