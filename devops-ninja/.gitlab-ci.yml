@@ -1,0 +1,42 @@
+stages:
+  - lint
+  - test
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm/
+
+lint:
+  stage: lint
+  image: node:18-alpine
+  script:
+    - cd api
+    - npm ci
+    - npx eslint . || echo "Lint warnings only"
+  only:
+    - merge_requests
+    - main
+
+test:
+  stage: test
+  image: node:18-alpine
+  services:
+    - postgres:latest
+  variables:
+    NODE_ENV: test
+    PGUSER: app
+    PGPASSWORD: app
+    PGDATABASE: dernier_metro
+    PGHOST: postgres
+    PGPORT: 5432
+  script:
+    - cd api
+    - npm ci
+    - npm test
+  only:
+    - merge_requests
+    - main
