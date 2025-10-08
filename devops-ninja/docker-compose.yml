@@ -44,6 +44,20 @@ services:
       - api
       - postgres
 
+  test-runner:
+    build: ./api
+    command: npm test
+    depends_on:
+      - postgres
+    environment:
+      NODE_ENV: test
+      PGUSER: app
+      PGPASSWORD: app
+      PGDATABASE: dernier_metro
+      PGHOST: postgres
+      PGPORT: 5432
+
+
 volumes:
   pgdata:
     # Volume nommé pour les données Postgres (créé automatiquement)
