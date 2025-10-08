@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const app = express();
 
@@ -14,7 +15,7 @@ const dbPool = new Pool({
 	user: process.env.PGUSER || "app",
 	password: process.env.PGPASSWORD || "app",
 	database: process.env.PGDATABASE || "dernier_metro",
-	host: process.env.PGHOST || "postgres",
+	host: process.env.PGHOST,
 	port: Number(process.env.PGPORT || 5432),
 	max: 5,
 	idleTimeoutMillis: 10000
